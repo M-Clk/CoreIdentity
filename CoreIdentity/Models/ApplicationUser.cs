@@ -8,5 +8,6 @@ namespace CoreIdentity.Models
 {
     public class ApplicationUser:IdentityUser
     {
+
     }
 }

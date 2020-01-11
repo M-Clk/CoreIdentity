@@ -2,9 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CoreIdentity.Infrastucture;
+using CoreIdentity.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -21,6 +25,21 @@ namespace CoreIdentity
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<ApplicationIdentityDbContext>(
+                options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddTransient<IPasswordValidator<ApplicationUser>, CustomPasswordValidator>();
+            //Identity yi servislere eklerken istersek gerekli validation islemlerini asagidaki gibi buradan yonetebiliriz. Ancak bunlar bazen bizim istedigimiz bir dogrulama islemini icermiyor olabilir. Bu durumda kendi validator sinifimizi yazip ustteki gibi AddTransient metoduyla tanimlayarak daha guvenli bir yapi ortaya koyabiliriz.
+            services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            {
+                options.Password.RequiredLength = 7;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireDigit = false;
+            })
+                .AddEntityFrameworkStores<ApplicationIdentityDbContext>()
+                .AddDefaultTokenProviders();
             services.AddMvc();
         }
 
@@ -33,6 +52,7 @@ namespace CoreIdentity
             }
             app.UseStaticFiles();
             app.UseStatusCodePages();
+            app.UseAuthentication();
 
             app.UseMvc(roures =>
             {
