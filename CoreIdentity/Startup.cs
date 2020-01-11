@@ -25,10 +25,12 @@ namespace CoreIdentity
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+
             services.AddDbContext<ApplicationIdentityDbContext>(
                 options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddTransient<IPasswordValidator<ApplicationUser>, CustomPasswordValidator>();
+            services.AddTransient<IUserValidator<ApplicationUser>, CustomUserValidator>();
             //Identity yi servislere eklerken istersek gerekli validation islemlerini asagidaki gibi buradan yonetebiliriz. Ancak bunlar bazen bizim istedigimiz bir dogrulama islemini icermiyor olabilir. Bu durumda kendi validator sinifimizi yazip ustteki gibi AddTransient metoduyla tanimlayarak daha guvenli bir yapi ortaya koyabiliriz.
             services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
@@ -37,6 +39,8 @@ namespace CoreIdentity
                 options.Password.RequireUppercase = false;
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireDigit = false;
+                options.User.RequireUniqueEmail = true;//Ayni kullanici adinda kullanici kabul edip etmeyecegini belirtiyoruz
+                options.User.AllowedUserNameCharacters = "abcdefghklmnouprstuvwyz1234567890";//Kullanici adinda kullanilabilen karakterler.
             })
                 .AddEntityFrameworkStores<ApplicationIdentityDbContext>()
                 .AddDefaultTokenProviders();
