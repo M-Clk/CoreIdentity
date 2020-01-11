@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<ApplicationUser>
 @{
     ViewData["Title"] = "Index";
-       Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <div class="bg-primary text-white p-1 m-1">
     <h2>User List</h2>
@@ -34,6 +34,7 @@
                 <td>
                     <form asp-action="Delete" asp-route-id="@user.Id" method="post">
                         <button type="submit" value="Delete" class="btn btn-danger">Delete</button>
+                        <a  asp-action="Update" asp-route-id="@user.Id" class="btn btn-primary">Update</a>
                     </form>
 
                 </td>
